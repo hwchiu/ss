@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Kubernetes Serverless 平台互動式比較指南">
+  <title>K8s Serverless 平台比較</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#overview" aria-label="回到總覽">
+      <span class="brand-mark"><i data-lucide="layers-3"></i></span>
+      <span><strong>Serverless Atlas</strong><small>Kubernetes 平台研究</small></span>
+    </a>
+    <nav class="top-actions" aria-label="頁面工具">
+      <span class="updated"><i data-lucide="calendar-clock"></i> 2026.07</span>
+      <a class="icon-button" href="kubernetes-serverless-platform-research.md" title="開啟完整研究文件" aria-label="開啟完整研究文件"><i data-lucide="file-text"></i></a>
+    </nav>
+  </header>
+
+  <div class="app-shell">
+    <aside class="sidebar">
+      <nav aria-label="主要導覽">
+        <a class="nav-item active" href="#overview" data-section-link="overview"><i data-lucide="layout-dashboard"></i><span>快速總覽</span></a>
+        <a class="nav-item" href="#cloud" data-section-link="cloud"><i data-lucide="cloud"></i><span>公有雲</span></a>
+        <a class="nav-item" href="#opensource" data-section-link="opensource"><i data-lucide="boxes"></i><span>開源方案</span></a>
+        <a class="nav-item" href="#architecture" data-section-link="architecture"><i data-lucide="workflow"></i><span>建議架構</span></a>
+        <a class="nav-item" href="#experience" data-section-link="experience"><i data-lucide="panel-top"></i><span>使用者介面</span></a>
+      </nav>
+      <div class="sidebar-note">
+        <span class="note-label">核心判斷</span>
+        <p>Function 是開發體驗，執行層應統一收斂成 OCI container 與 immutable revision。</p>
+      </div>
+    </aside>
+
+    <main>
+      <section id="overview" class="page-section active" data-section="overview">
+        <div class="section-heading">
+          <div><span class="eyebrow">DECISION BOARD</span><h1>Kubernetes Serverless 平台比較</h1><p>從產品體驗倒推自建架構，先看差異，再深入細節。</p></div>
+          <div class="recommendation"><span>建議 PoC 起點</span><strong>Knative Serving + KEDA</strong></div>
+        </div>
+
+        <div class="signal-grid">
+          <article class="signal"><span class="signal-icon green"><i data-lucide="container"></i></span><div><strong>容器為共同底座</strong><p>Source 與 Function 最後都轉為 OCI image</p></div></article>
+          <article class="signal"><span class="signal-icon amber"><i data-lucide="history"></i></span><div><strong>Revision 優先</strong><p>流量切分、回滾與版本追溯是一級能力</p></div></article>
+          <article class="signal"><span class="signal-icon blue"><i data-lucide="activity"></i></span><div><strong>0 → 1 是完整路徑</strong><p>需要攔截、暫存、喚醒與過載保護</p></div></article>
+        </div>
+
+        <div class="panel matrix-panel">
+          <div class="panel-head">
+            <div><h2>開源方案能力矩陣</h2><p>點擊欄位選擇主要排序維度；評分代表自建平台適配度。</p></div>
+            <div class="segmented" role="group" aria-label="方案篩選">
+              <button class="active" data-filter="all">全部</button>
+              <button data-filter="platform">完整平台</button>
+              <button data-filter="component">能力元件</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="score-table">
+              <thead><tr><th>方案</th><th><button data-sort="http">HTTP 容器</button></th><th><button data-sort="dx">Function DX</button></th><th><button data-sort="revision">Revision</button></th><th><button data-sort="scale">Scale-to-zero</button></th><th><button data-sort="event">事件伸縮</button></th><th><button data-sort="gitops">GitOps</button></th><th>定位</th></tr></thead>
+              <tbody id="score-body"></tbody>
+            </table>
+          </div>
+          <p class="legend"><span><b class="score-dot high"></b>強</span><span><b class="score-dot mid"></b>中等</span><span><b class="score-dot low"></b>需自行建置</span></p>
+        </div>
+
+        <div class="split-grid">
+          <article class="panel decision-panel"><div class="panel-head"><div><h2>依目標快速選擇</h2><p>選擇最接近的建設目標。</p></div></div><div id="goal-list" class="goal-list"></div><div id="goal-answer" class="goal-answer"></div></article>
+          <article class="panel boundary-panel"><div class="panel-head"><div><h2>先釐清產品邊界</h2><p>名稱相近，責任範圍完全不同。</p></div></div>
+            <div class="boundary-row"><span class="boundary-icon"><i data-lucide="blocks"></i></span><div><strong>平台</strong><p>入口、revision、runtime、事件、觀測與開發體驗</p></div><span class="tag green-tag">Knative / OpenFaaS</span></div>
+            <div class="boundary-row"><span class="boundary-icon"><i data-lucide="gauge"></i></span><div><strong>能力元件</strong><p>把外部事件指標接到 Kubernetes HPA</p></div><span class="tag amber-tag">KEDA</span></div>
+            <div class="boundary-row"><span class="boundary-icon"><i data-lucide="cloud-cog"></i></span><div><strong>產品參考</strong><p>用來學習體驗，不推定內部基於 Kubernetes</p></div><span class="tag blue-tag">Public Cloud</span></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="cloud" class="page-section" data-section="cloud">
+        <div class="section-heading compact"><div><span class="eyebrow">PRODUCT PATTERNS</span><h1>公有雲怎麼設計</h1><p>比較產品模型、發布、伸縮與操作入口。</p></div></div>
+        <div id="cloud-cards" class="product-grid"></div>
+        <div class="panel">
+          <div class="panel-head"><div><h2>使用者介面對照</h2><p>成熟產品都同時提供互動操作與自動化介面。</p></div></div>
+          <div class="table-wrap"><table class="plain-table"><thead><tr><th>能力</th><th>Cloud Run</th><th>AWS Lambda</th><th>Azure Container Apps</th><th>Function Compute</th></tr></thead><tbody id="cloud-ui-body"></tbody></table></div>
+        </div>
+      </section>
+
+      <section id="opensource" class="page-section" data-section="opensource">
+        <div class="section-heading compact"><div><span class="eyebrow">BUILD OR ADOPT</span><h1>開源方案深度比較</h1><p>勾選 2–3 個方案，只保留需要比較的內容。</p></div></div>
+        <div class="compare-toolbar"><div id="compare-options" class="check-group"></div><button id="reset-compare" class="text-button"><i data-lucide="rotate-ccw"></i>重設</button></div>
+        <div id="compare-cards" class="compare-grid"></div>
+      </section>
+
+      <section id="architecture" class="page-section" data-section="architecture">
+        <div class="section-heading compact"><div><span class="eyebrow">REFERENCE ARCHITECTURE</span><h1>建議的自建平台</h1><p>以高階資源模型隔離開發者與 Kubernetes 實作細節。</p></div></div>
+        <div class="architecture-map" aria-label="Serverless 平台資料流架構圖">
+          <div class="arch-lane lane-entry"><span>使用者入口</span><div class="arch-items"><div><i data-lucide="panel-top"></i><b>Portal</b></div><div><i data-lucide="terminal"></i><b>CLI</b></div><div><i data-lucide="git-branch"></i><b>GitOps</b></div></div></div>
+          <div class="arch-arrow"><i data-lucide="arrow-down"></i></div>
+          <div class="arch-lane lane-control"><span>平台控制面</span><div class="arch-items"><div><i data-lucide="braces"></i><b>Platform API</b><small>Service / Function / Job</small></div><div><i data-lucide="hammer"></i><b>Build</b><small>Source → OCI</small></div><div><i data-lucide="shield-check"></i><b>Policy</b><small>Identity / Quota</small></div></div></div>
+          <div class="arch-arrow"><i data-lucide="arrow-down"></i></div>
+          <div class="arch-lane lane-runtime"><span>執行與事件</span><div class="arch-items"><div class="selected"><i data-lucide="route"></i><b>Knative Serving</b><small>HTTP / Revision / Traffic</small></div><div class="selected"><i data-lucide="activity"></i><b>KEDA</b><small>Worker / Job scaling</small></div><div><i data-lucide="radio-tower"></i><b>Event Broker</b><small>Retry / DLQ / Replay</small></div></div></div>
+          <div class="arch-arrow"><i data-lucide="arrow-down"></i></div>
+          <div class="arch-lane lane-foundation"><span>Kubernetes 基礎</span><div class="arch-items"><div><i data-lucide="network"></i><b>Gateway API</b></div><div><i data-lucide="fingerprint"></i><b>Workload Identity</b></div><div><i data-lucide="telescope"></i><b>OpenTelemetry</b></div><div><i data-lucide="package-check"></i><b>OCI Registry</b></div></div></div>
+        </div>
+        <div class="split-grid architecture-notes"><article class="panel"><div class="panel-head"><div><h2>對外資源模型</h2><p>讓 Function 成為 DX，而不是第二套 runtime。</p></div></div><pre><code>Project / Environment
+├── Service
+│   ├── Revision
+│   ├── Route
+│   └── Trigger
+├── Function → Service / Revision
+├── Job
+└── Worker</code></pre></article><article class="panel"><div class="panel-head"><div><h2>關鍵設計原則</h2></div></div><ol class="principles"><li><span>01</span><p><strong>穩定 endpoint，不可變 revision</strong>部署與流量操作彼此解耦。</p></li><li><span>02</span><p><strong>控制面失效，資料面繼續服務</strong>避免平台 API 成為線上請求依賴。</p></li><li><span>03</span><p><strong>事件採 at-least-once 設計</strong>提供 retry、DLQ、replay 與冪等鍵。</p></li></ol></article></div>
+      </section>
+
+      <section id="experience" class="page-section" data-section="experience">
+        <div class="section-heading compact"><div><span class="eyebrow">DEVELOPER EXPERIENCE</span><h1>平台介面應該提供什麼</h1><p>Portal、CLI 與 GitOps 操作同一組高階 API。</p></div></div>
+        <div class="workflow-strip"><div class="workflow-step active"><span>1</span><div><b>選工作負載</b><small>Service / Function / Job / Worker</small></div></div><i data-lucide="chevron-right"></i><div class="workflow-step"><span>2</span><div><b>選來源</b><small>Git / Source / OCI image</small></div></div><i data-lucide="chevron-right"></i><div class="workflow-step"><span>3</span><div><b>設定觸發</b><small>HTTP / Queue / Schedule</small></div></div><i data-lucide="chevron-right"></i><div class="workflow-step"><span>4</span><div><b>資源與安全</b><small>Scale / Identity / Network</small></div></div><i data-lucide="chevron-right"></i><div class="workflow-step"><span>5</span><div><b>檢查並部署</b><small>Policy / Cost / Revision</small></div></div></div>
+        <div class="experience-grid" id="experience-grid"></div>
+        <div class="panel avoid-panel"><div class="panel-head"><div><h2>介面上應避免</h2></div></div><div class="avoid-grid"><div><i data-lucide="split"></i><p>讓使用者自己組 Deployment、Service、Ingress、HPA</p></div><div><i data-lucide="file-warning"></i><p>只提供自由格式 YAML，沒有 schema 與 policy 預覽</p></div><div><i data-lucide="logs"></i><p>混合 build、platform、invocation 與 pod logs</p></div><div><i data-lucide="chart-no-axes-column-decreasing"></i><p>只顯示 replica 數，不說明伸縮原因與 cold start</p></div></div></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
