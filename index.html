@@ -103,11 +103,14 @@
       </section>
 
       <section id="cloud" class="page-section" data-section="cloud">
-        <div class="section-heading compact"><div><span class="eyebrow">PRODUCT PATTERNS</span><h1>公有雲怎麼設計</h1><p>比較產品模型、發布、伸縮與操作入口。</p></div></div>
-        <div id="cloud-cards" class="product-grid"></div>
-        <div class="panel">
-          <div class="panel-head"><div><h2>使用者介面對照</h2><p>成熟產品都同時提供互動操作與自動化介面。</p></div></div>
-          <div class="table-wrap"><table class="plain-table"><thead><tr><th>能力</th><th>Cloud Run</th><th>AWS Lambda</th><th>Azure Container Apps</th><th>Function Compute</th></tr></thead><tbody id="cloud-ui-body"></tbody></table></div>
+        <div class="section-heading compact"><div><span class="eyebrow">PUBLIC CLOUD PLAYBOOKS</span><h1>選一個平台，走完一次部署</h1><p>使用相同的 checkout API 情境，理解入口、必要參數、CLI、呼叫方式與發布操作。</p></div></div>
+        <div class="cloud-page-shell">
+          <aside class="cloud-product-nav" aria-label="公有雲產品選擇">
+            <span class="cloud-nav-label">選擇產品</span>
+            <div id="cloud-page-options"></div>
+            <div class="cloud-scenario"><i data-lucide="shopping-cart"></i><div><span>共同範例</span><b>Checkout API</b><small>公開 HTTP endpoint<br>環境變數 `APP_ENV=demo`<br>可縮至零</small></div></div>
+          </aside>
+          <div id="cloud-page-content" class="cloud-page-content" aria-live="polite"></div>
         </div>
       </section>
 
