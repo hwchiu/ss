@@ -29,8 +29,27 @@ const goals = [
   {label:'只替既有服務加入事件伸縮', answer:'KEDA', why:'不需要引入完整 FaaS；直接替 Deployment、StatefulSet 或 Job 加 scaler。'}
 ];
 
+const experiments = [
+  ['mouse-pointer-click','HTTP service','0→1、100 並行請求、20 秒處理、gRPC、canary 90/10'],
+  ['messages-square','Queue worker','10k backlog、retry、DLQ、scale from/to zero'],
+  ['calendar-clock','Scheduled job','parallelism、timeout、retry、取消與 execution history'],
+  ['package-check','Build supply chain','Git commit 到 signed image、SBOM、私有 dependency、cache'],
+  ['shield-check','Multi-tenancy','兩個團隊的 quota、network、identity 與越權測試'],
+  ['heart-pulse','Day-2 operations','Controller、gateway、broker 故障，node drain、升級與還原']
+];
+
+const sources = [
+  ['Cloud Run','https://docs.cloud.google.com/run/docs/overview/what-is-cloud-run'],
+  ['AWS Lambda','https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html'],
+  ['Azure Container Apps','https://learn.microsoft.com/en-us/azure/container-apps/overview'],
+  ['Knative','https://knative.dev/docs/serving/architecture/'],
+  ['KEDA','https://keda.sh/docs/2.20/concepts/'],
+  ['OpenFaaS','https://docs.openfaas.com/architecture/stack/']
+];
+
 function logo(item, className='product-logo') { return `<img class="${className}" src="${item.logo}" alt="${item.name} logo" onerror="this.outerHTML='<span class=&quot;product-fallback&quot;>${item.short || item.name.slice(0,2)}</span>'">`; }
 function score(value){const level=value>=4?'high':value>=3?'mid':'low';return `<span class="score-bar ${level}" aria-label="${value} 分">${[1,2,3,4,5].map(i=>`<i class="${i<=value?'filled':''}"></i>`).join('')}</span>`}
+function refreshIcons(){if(window.lucide)window.lucide.createIcons()}
 
 let currentFilter='all', currentSort='http';
 function renderScores(){
@@ -43,7 +62,7 @@ function renderScores(){
 function renderGoals(){
   const list=document.querySelector('#goal-list'), answer=document.querySelector('#goal-answer');
   list.innerHTML=goals.map((g,i)=>`<button class="${i===0?'active':''}" data-goal="${i}"><span>${g.label}</span><i data-lucide="arrow-right"></i></button>`).join('');
-  const show=i=>{const g=goals[i];answer.innerHTML=`<strong>${g.answer}</strong>${g.why}`;list.querySelectorAll('button').forEach((b,n)=>b.classList.toggle('active',n===i));lucide.createIcons()};
+  const show=i=>{const g=goals[i];answer.innerHTML=`<strong>${g.answer}</strong>${g.why}`;list.querySelectorAll('button').forEach((b,n)=>b.classList.toggle('active',n===i));refreshIcons()};
   list.addEventListener('click',e=>{const b=e.target.closest('button');if(b)show(Number(b.dataset.goal))}); show(0);
 }
 
@@ -57,7 +76,7 @@ function renderCompare(){
   const options=document.querySelector('#compare-options');
   options.innerHTML=Object.entries(products).map(([id,p])=>`<span class="check-option"><input id="check-${id}" type="checkbox" value="${id}" ${compared.includes(id)?'checked':''}><label for="check-${id}">${p.name}</label></span>`).join('');
   document.querySelector('#compare-cards').innerHTML=compared.map(id=>{const p=products[id];return `<article class="compare-card"><div class="compare-card-head">${logo(p)}<div><h2>${p.name}</h2><small>${p.position}</small></div></div><div class="compare-card-body"><div class="compare-section"><span>架構核心</span><p>${p.architecture}</p></div><div class="compare-section"><span>使用介面</span><p>${p.interface}</p></div><div class="compare-section pros-cons"><div class="pros"><b>優勢</b><br>${p.good}</div><div class="cons"><b>代價</b><br>${p.tradeoff}</div></div><div class="compare-section"><span>最適合</span><p><strong>${p.fit}</strong></p></div></div></article>`}).join('') || '<div class="goal-answer">請至少選擇一個方案。</div>';
-  options.addEventListener('change',e=>{if(!e.target.matches('input'))return;compared=e.target.checked?[...compared,e.target.value]:compared.filter(x=>x!==e.target.value);renderCompare();lucide.createIcons()},{once:true});
+  options.addEventListener('change',e=>{if(!e.target.matches('input'))return;compared=e.target.checked?[...compared,e.target.value]:compared.filter(x=>x!==e.target.value);renderCompare();refreshIcons()},{once:true});
 }
 
 function renderExperience(){
@@ -69,6 +88,11 @@ function renderExperience(){
   document.querySelector('#experience-grid').innerHTML=cards.map(c=>`<article class="experience-card"><div class="experience-card-head"><span><i data-lucide="${c[0]}"></i></span><h2>${c[1]}</h2></div><ul>${c[2].map(x=>`<li>${x}</li>`).join('')}</ul></article>`).join('');
 }
 
+function renderRoadmap(){
+  document.querySelector('#experiment-grid').innerHTML=experiments.map(item=>`<article class="experiment-item"><span><i data-lucide="${item[0]}"></i></span><div><b>${item[1]}</b><p>${item[2]}</p></div></article>`).join('');
+  document.querySelector('#source-list').innerHTML=sources.map(item=>`<a href="${item[1]}" target="_blank" rel="noreferrer"><span>${item[0]} 官方文件</span><i data-lucide="external-link"></i></a>`).join('');
+}
+
 function showSection(id){
   const target=document.querySelector(`[data-section="${id}"]`)||document.querySelector('[data-section="overview"]');
   document.querySelectorAll('.page-section').forEach(s=>s.classList.toggle('active',s===target));
@@ -78,8 +102,8 @@ function showSection(id){
 
 document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{currentFilter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));renderScores()}));
 document.querySelectorAll('[data-sort]').forEach(b=>b.addEventListener('click',()=>{currentSort=b.dataset.sort;renderScores()}));
-document.querySelector('#reset-compare').addEventListener('click',()=>{compared=['knative','openfaas','keda'];renderCompare();lucide.createIcons()});
+document.querySelector('#reset-compare').addEventListener('click',()=>{compared=['knative','openfaas','keda'];renderCompare();refreshIcons()});
 window.addEventListener('hashchange',()=>showSection(location.hash.slice(1)||'overview'));
 
-renderScores();renderGoals();renderClouds();renderCompare();renderExperience();showSection(location.hash.slice(1)||'overview');
-if(window.lucide)lucide.createIcons();
+renderScores();renderGoals();renderClouds();renderCompare();renderExperience();renderRoadmap();showSection(location.hash.slice(1)||'overview');
+refreshIcons();

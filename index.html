@@ -4,6 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Kubernetes Serverless 平台互動式比較指南">
+  <meta name="theme-color" content="#17201c">
+  <meta property="og:title" content="Serverless Atlas — Kubernetes 平台決策指南">
+  <meta property="og:description" content="從公有雲產品、開源架構到 PoC 路線，系統性探索如何打造 Kubernetes Serverless Platform。">
+  <meta property="og:type" content="website">
   <title>K8s Serverless 平台比較</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="styles.css">
@@ -12,10 +16,10 @@
   <header class="topbar">
     <a class="brand" href="#overview" aria-label="回到總覽">
       <span class="brand-mark"><i data-lucide="layers-3"></i></span>
-      <span><strong>Serverless Atlas</strong><small>Kubernetes 平台研究</small></span>
+      <span><strong>Serverless Atlas</strong><small>Kubernetes 平台決策指南</small></span>
     </a>
     <nav class="top-actions" aria-label="頁面工具">
-      <span class="updated"><i data-lucide="calendar-clock"></i> 2026.07</span>
+      <span class="updated"><i data-lucide="calendar-clock"></i> 2026.07.22</span>
       <a class="icon-button" href="kubernetes-serverless-platform-research.md" title="開啟完整研究文件" aria-label="開啟完整研究文件"><i data-lucide="file-text"></i></a>
     </nav>
   </header>
@@ -24,10 +28,12 @@
     <aside class="sidebar">
       <nav aria-label="主要導覽">
         <a class="nav-item active" href="#overview" data-section-link="overview"><i data-lucide="layout-dashboard"></i><span>快速總覽</span></a>
+        <a class="nav-item" href="#primer" data-section-link="primer"><i data-lucide="book-open"></i><span>Serverless 101</span></a>
         <a class="nav-item" href="#cloud" data-section-link="cloud"><i data-lucide="cloud"></i><span>公有雲</span></a>
         <a class="nav-item" href="#opensource" data-section-link="opensource"><i data-lucide="boxes"></i><span>開源方案</span></a>
         <a class="nav-item" href="#architecture" data-section-link="architecture"><i data-lucide="workflow"></i><span>建議架構</span></a>
         <a class="nav-item" href="#experience" data-section-link="experience"><i data-lucide="panel-top"></i><span>使用者介面</span></a>
+        <a class="nav-item" href="#roadmap" data-section-link="roadmap"><i data-lucide="milestone"></i><span>落地路線</span></a>
       </nav>
       <div class="sidebar-note">
         <span class="note-label">核心判斷</span>
@@ -38,8 +44,13 @@
     <main>
       <section id="overview" class="page-section active" data-section="overview">
         <div class="section-heading">
-          <div><span class="eyebrow">DECISION BOARD</span><h1>Kubernetes Serverless 平台比較</h1><p>從產品體驗倒推自建架構，先看差異，再深入細節。</p></div>
+          <div><span class="eyebrow">DECISION BRIEF</span><h1>我們該如何打造 Serverless Platform？</h1><p>從公有雲產品經驗、開源技術與平台工程需求，收斂出可執行的答案。</p></div>
           <div class="recommendation"><span>建議 PoC 起點</span><strong>Knative Serving + KEDA</strong></div>
+        </div>
+
+        <div class="verdict panel">
+          <div class="verdict-main"><span class="verdict-number">01</span><div><span class="eyebrow">OUR POSITION</span><h2>先做 Application Platform，再提供 Function 體驗</h2><p>核心執行面統一成 OCI container、immutable revision 與 workload identity；Function 只是 source template、handler contract 與事件綁定的簡化入口。</p></div></div>
+          <div class="verdict-actions"><div><i data-lucide="check"></i><span><b>應該做</b>Service / Function / Job / Worker 四種意圖</span></div><div><i data-lucide="x"></i><span><b>不應該做</b>讓開發者直接組 Deployment、Service、HPA</span></div><div><i data-lucide="flask-conical"></i><span><b>先驗證</b>0→1 延遲、事件恢復、多租戶隔離與升級</span></div></div>
         </div>
 
         <div class="signal-grid">
@@ -74,6 +85,21 @@
             <div class="boundary-row"><span class="boundary-icon"><i data-lucide="cloud-cog"></i></span><div><strong>產品參考</strong><p>用來學習體驗，不推定內部基於 Kubernetes</p></div><span class="tag blue-tag">Public Cloud</span></div>
           </article>
         </div>
+      </section>
+
+      <section id="primer" class="page-section" data-section="primer">
+        <div class="section-heading compact"><div><span class="eyebrow">SHARED LANGUAGE</span><h1>Serverless 不是「沒有伺服器」</h1><p>它是一組平台承諾：抽象基礎設施、依需求伸縮、事件驅動、按實際使用承擔成本。</p></div></div>
+        <div class="definition-band">
+          <div><span>開發者交付</span><strong>程式碼或容器</strong><small>不管理 node、pod 與 ingress</small></div><i data-lucide="arrow-right"></i><div><span>平台負責</span><strong>Build、部署、路由、伸縮</strong><small>以 policy 與 identity 統一治理</small></div><i data-lucide="arrow-right"></i><div><span>工作負載取得</span><strong>穩定 endpoint 或事件來源</strong><small>流量與 revision 分離</small></div>
+        </div>
+        <div class="concept-grid">
+          <article class="concept-card"><span class="concept-index">01</span><i data-lucide="mouse-pointer-click"></i><h2>Request-driven</h2><p>HTTP/gRPC 請求驅動服務實例。沒有流量時可縮到零，但入口必須能等待新實例 ready。</p><footer>典型：API、網站、Webhook</footer></article>
+          <article class="concept-card"><span class="concept-index">02</span><i data-lucide="radio"></i><h2>Event-driven</h2><p>Queue、stream 或 cloud event 驅動 consumer。伸縮依據是 backlog，而不是單看 CPU。</p><footer>典型：Kafka、SQS、RabbitMQ</footer></article>
+          <article class="concept-card"><span class="concept-index">03</span><i data-lucide="timer"></i><h2>Run-to-completion</h2><p>一次執行完成後退出，支援平行度、逾時、重試與執行歷史，不應偽裝成常駐服務。</p><footer>典型：批次、排程、資料轉換</footer></article>
+          <article class="concept-card"><span class="concept-index">04</span><i data-lucide="repeat-2"></i><h2>Always-on worker</h2><p>主動拉取事件或維持連線，不一定適合 scale-to-zero，需要獨立的生命週期與計價思考。</p><footer>典型：Kafka consumer、stream</footer></article>
+        </div>
+        <div class="panel anatomy-panel"><div class="panel-head"><div><h2>一次部署背後發生什麼</h2><p>Serverless 的價值來自整條供應鏈，不只是 autoscaling。</p></div></div><div class="anatomy-flow"><div><span>01</span><i data-lucide="git-commit-horizontal"></i><b>Source</b><small>Commit / manifest</small></div><div><span>02</span><i data-lucide="hammer"></i><b>Build</b><small>Buildpack / Dockerfile</small></div><div><span>03</span><i data-lucide="package-check"></i><b>Artifact</b><small>OCI / SBOM / signature</small></div><div><span>04</span><i data-lucide="history"></i><b>Revision</b><small>Image + config snapshot</small></div><div><span>05</span><i data-lucide="route"></i><b>Route</b><small>Endpoint / traffic</small></div><div><span>06</span><i data-lucide="telescope"></i><b>Operate</b><small>Logs / metrics / traces</small></div></div></div>
+        <div class="myth-grid"><article><span>常見誤解</span><h3>裝了 KEDA 就有 Serverless</h3><p>KEDA 解決事件指標與 HPA 伸縮；沒有處理 revision、入口、build、runtime、traffic 與開發者介面。</p></article><article><span>常見誤解</span><h3>Scale-to-zero 就一定省錢</h3><p>冷啟動、預留容量、broker、gateway 與控制面仍有成本；需以完整 workload economics 評估。</p></article><article><span>常見誤解</span><h3>Namespace 等於多租戶隔離</h3><p>還需要 quota、network policy、workload identity、admission policy、runtime sandbox 與獨立 node pool 策略。</p></article></div>
       </section>
 
       <section id="cloud" class="page-section" data-section="cloud">
@@ -118,10 +144,27 @@
         <div class="experience-grid" id="experience-grid"></div>
         <div class="panel avoid-panel"><div class="panel-head"><div><h2>介面上應避免</h2></div></div><div class="avoid-grid"><div><i data-lucide="split"></i><p>讓使用者自己組 Deployment、Service、Ingress、HPA</p></div><div><i data-lucide="file-warning"></i><p>只提供自由格式 YAML，沒有 schema 與 policy 預覽</p></div><div><i data-lucide="logs"></i><p>混合 build、platform、invocation 與 pod logs</p></div><div><i data-lucide="chart-no-axes-column-decreasing"></i><p>只顯示 replica 數，不說明伸縮原因與 cold start</p></div></div></div>
       </section>
+
+      <section id="roadmap" class="page-section" data-section="roadmap">
+        <div class="section-heading compact"><div><span class="eyebrow">FROM RESEARCH TO PLATFORM</span><h1>落地路線與驗證標準</h1><p>先建立可否證的 PoC，再逐步增加產品表面；不要先投入完整 Portal。</p></div></div>
+        <div class="roadmap-grid">
+          <article class="roadmap-stage current"><header><span>Phase 1</span><b>執行面 PoC</b><small>2–3 週</small></header><ul><li>Knative Serving + KEDA</li><li>HTTP、queue worker、scheduled job</li><li>Revision、traffic split、scale-to-zero</li></ul><footer><i data-lucide="flag"></i>通過冷啟動與故障測試</footer></article>
+          <article class="roadmap-stage"><header><span>Phase 2</span><b>Function DX 對照</b><small>1–2 週</small></header><ul><li>OpenFaaS / Fission 同題測試</li><li>Template、CLI、warm pool</li><li>量化開發步驟與營運成本</li></ul><footer><i data-lucide="flag"></i>決定核心與可借鑑功能</footer></article>
+          <article class="roadmap-stage"><header><span>Phase 3</span><b>薄平台產品</b><small>3–5 週</small></header><ul><li>高階 API 與 resource schema</li><li>List / Create / Detail / Revision</li><li>Identity、quota、policy、observability</li></ul><footer><i data-lucide="flag"></i>兩個團隊完成 self-service</footer></article>
+          <article class="roadmap-stage"><header><span>Phase 4</span><b>Production readiness</b><small>持續</small></header><ul><li>事件恢復與 multi-tenancy</li><li>HA、升級、容量與成本歸屬</li><li>SLO、runbook、failure injection</li></ul><footer><i data-lucide="flag"></i>通過上線審查與演練</footer></article>
+        </div>
+        <div class="panel experiment-panel"><div class="panel-head"><div><h2>PoC 不要只跑 Hello World</h2><p>同一測試套件套用到每個候選方案。</p></div><span class="tag green-tag">6 組測試</span></div><div id="experiment-grid" class="experiment-grid"></div></div>
+        <div class="split-grid evidence-row">
+          <article class="panel metric-panel"><div class="panel-head"><div><h2>必須量化</h2><p>沒有數據就無法比較平台代價。</p></div></div><div class="metric-list"><div><b>Latency</b><span>p50 / p95 / p99 cold start、ready time</span></div><div><b>Capacity</b><span>最大穩定 RPS、queue lag、scale-up slope</span></div><div><b>Reliability</b><span>retry、DLQ、recovery time、控制面失效影響</span></div><div><b>Experience</b><span>完成 deploy、debug、rollback 的步驟與時間</span></div><div><b>Economics</b><span>每百萬請求與 idle baseline 的 CPU/memory 成本</span></div></div></article>
+          <article class="panel source-panel"><div class="panel-head"><div><h2>研究來源與方法</h2><p>優先使用官方文件，評分是架構適配判斷而非人氣排名。</p></div></div><div id="source-list" class="source-list"></div><a class="full-report" href="kubernetes-serverless-platform-research.md"><i data-lucide="file-text"></i><span><b>閱讀完整研究文件</b><small>詳細架構、限制、風險與所有來源</small></span><i data-lucide="arrow-right"></i></a></article>
+        </div>
+        <div class="final-callout"><span class="eyebrow">THE BOTTOM LINE</span><h2>先證明平台能可靠承接工作負載，再追求「像公有雲」的介面。</h2><p>第一個可交付成果不是 WebIDE，而是穩定的 revision、可靠的 0→1、可恢復的事件與不洩漏 Kubernetes 細節的高階 API。</p></div>
+      </section>
     </main>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
   <script src="app.js"></script>
+  <noscript><p class="noscript">此頁面的比較矩陣需要 JavaScript；完整研究內容仍可由右上角文件連結閱讀。</p></noscript>
 </body>
 </html>
